@@ -1,0 +1,36 @@
+# Optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables / secrets
+.env
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test
+.pytest_cache/
+
+# MySQL dumps (don't commit raw data)
+*.sql.bak
+*.dump
+
+# Uploaded spreadsheets (keep only the template)
+uploads/
+*.xlsx
+!templates/sample_import.xlsx
