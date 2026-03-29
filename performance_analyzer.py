@@ -18,11 +18,11 @@ def get_performance(score):
         return "Needs Improvement"
 
 def add_student():
-    student_id = raw_input("Enter ID: ")
-    name = raw_input("Enter Name: ")
+    student_id = input("Enter ID: ")
+    name = input("Enter Name: ")
 
     try:
-        score = int(raw_input("Enter Score: "))
+        score = int(input("Enter Score: "))
     except:
         print("Invalid score")
         return
@@ -41,7 +41,7 @@ def view_students():
             print(line.strip())
 
 def update_student():
-    student_id = raw_input("Enter ID to update: ")
+    student_id = input("Enter ID to update: ")
     lines = []
     found = False
 
@@ -50,9 +50,9 @@ def update_student():
             data = line.strip().split(",")
             if data[0] == student_id:
                 found = True
-                name = raw_input("New name: ")
+                name = input("New name: ")
                 try:
-                    score = int(raw_input("New score: "))
+                    score = int(input("New score: "))
                 except:
                     print("Invalid score")
                     return
@@ -70,7 +70,7 @@ def update_student():
     print("Updated successfully")
 
 def delete_student():
-    student_id = raw_input("Enter ID to delete: ")
+    student_id = input("Enter ID to delete: ")
     lines = []
     found = False
 
@@ -99,7 +99,7 @@ def menu():
         print("4. Delete Student")
         print("5. Exit")
 
-        choice = raw_input("Choose: ")
+        choice = input("Choose: ")
 
         if choice == "1":
             add_student()
