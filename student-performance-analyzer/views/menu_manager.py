@@ -16,10 +16,10 @@ class MenuManager:
         self.display = DisplayHelper()
 
     def run(self):
-        """Phase 5: Main loop for login and routing"""
+        """Main loop for login and routing"""
         while True:
             self.display.clear_screen()
-            print("🎓 STUDENT PERFORMANCE ANALYZER")
+            print("STUDENT PERFORMANCE ANALYZER")
             print("[1] Teacher Login\n[2] Student Login\n[3] Exit")
             
             choice = input("\nSelect an option: ")
@@ -45,7 +45,7 @@ class MenuManager:
         self.student_menu(code)
 
     def teacher_menu(self):
-        """Teacher Menu with all 9 required actions"""
+        """Teacher Menu"""
         while True:
             options = [
                 "Add Student", "Bulk Import", "View All Students",
@@ -59,7 +59,7 @@ class MenuManager:
             input("Press Enter...")
 
     def student_menu(self, student_code):
-        """Student Portal with 4 required actions"""
+        """Student Portal"""
         while True:
             options = ["View My Grades", "View Feedback", "Topic Breakdown", "Logout"]
             self.display.print_menu(f"STUDENT PORTAL ({student_code})", options)
