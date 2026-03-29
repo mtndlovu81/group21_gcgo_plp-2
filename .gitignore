@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-.env
-.venv
-.vscode/
-.idea/
-*.xlsx
-!templates/sample_import.xlsx
-
