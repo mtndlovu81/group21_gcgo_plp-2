@@ -11,6 +11,7 @@ from utils.validators import (
 from services.data_importer import DataImporter
 from services.performance_analyzer import PerformanceAnalyzer
 from views.dashboard_view import DashboardView
+from views.student_portal import StudentPortal
 
 
 class MenuManager:
@@ -138,6 +139,15 @@ class MenuManager:
     def student_menu(self, student):
         options = ["View My Grades", "View Feedback", "Topic Breakdown", "Logout"]
 
+        analyzer = PerformanceAnalyzer(self.db)
+        portal   = StudentPortal(analyzer, self.display)
+
+        handlers = {
+            '1': lambda: portal.show_grades(student),
+            '2': lambda: portal.show_feedback(student),
+            '3': lambda: portal.show_topic_breakdown(student),
+        }
+
         while True:
             self.display.clear_screen()
             self.display.print_menu(f"STUDENT PORTAL — {student['first_name']}", options)
@@ -152,8 +162,7 @@ class MenuManager:
             if choice == '4':
                 break
 
-            self.display.print_warning(f"Feature [{choice}] coming in the next phase.")
-            input("Press Enter to continue...")
+            handlers[choice]()
 
     # ------------------------------------------------------------------
     # F2 — Bulk import
