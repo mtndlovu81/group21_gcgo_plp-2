@@ -43,6 +43,7 @@ class StudentPortal:
                 level = Score.get_performance_level(pct)
                 table_rows.append([
                     r['assessment_name'],
+                    r['topic_name'],
                     f"{r['score_value']}",
                     f"{r['max_score']}",
                     f"{pct}%",
@@ -52,7 +53,7 @@ class StudentPortal:
 
             print(tabulate(
                 table_rows,
-                headers=["Assessment", "Score", "Max", "Percentage", "Level"],
+                headers=["Assessment", "Topic", "Score", "Max", "Percentage", "Level"],
                 tablefmt='grid'
             ))
 

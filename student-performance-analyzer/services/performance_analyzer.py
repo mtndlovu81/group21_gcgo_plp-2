@@ -197,12 +197,14 @@ class PerformanceAnalyzer:
             SELECT
                 sub.subject_name,
                 a.assessment_name,
+                COALESCE(t.topic_name, '—') AS topic_name,
                 sc.score_value,
                 a.max_score,
                 ROUND((sc.score_value / a.max_score) * 100, 1) AS percentage
             FROM scores sc
-            JOIN assessments a  ON sc.assessment_id = a.assessment_id
-            JOIN subjects   sub ON a.subject_id      = sub.subject_id
+            JOIN assessments a   ON sc.assessment_id = a.assessment_id
+            JOIN subjects   sub  ON a.subject_id      = sub.subject_id
+            LEFT JOIN topics t   ON sc.topic_id       = t.topic_id
             WHERE sc.student_id = %s
             ORDER BY sub.subject_name, a.date_given
             """,
