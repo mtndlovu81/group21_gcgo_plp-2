@@ -9,6 +9,8 @@ from utils.validators import (
     validate_student_code, validate_non_empty, validate_score,
 )
 from services.data_importer import DataImporter
+from services.performance_analyzer import PerformanceAnalyzer
+from views.dashboard_view import DashboardView
 
 
 class MenuManager:
@@ -96,14 +98,19 @@ class MenuManager:
             "Logout",
         ]
 
+        analyzer  = PerformanceAnalyzer(self.db)
+        dashboard = DashboardView(analyzer, self.display)
+
         handlers = {
             '1': self._add_student,
             '2': self._bulk_import,
             '3': self._view_all_students,
+            '4': dashboard.show_dashboard,
+            '5': dashboard.show_struggling_students,
             '6': self._update_student,
             '7': self._delete_student,
         }
-        pending = {'4', '5', '8'}
+        pending = {'8'}
 
         while True:
             self.display.clear_screen()
