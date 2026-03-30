@@ -26,11 +26,19 @@ class MenuManager:
         self.importer = DataImporter(self.db)
 
     def run(self):
+ yannick-menu-system
         """Phase 5: Main application entry point loop"""
         while True:
             self.display.clear_screen()
             self.display.print_header("STUDENT PERFORMANCE ANALYZER")
             print("\n [1] Teacher Login\n [2] Student Login\n [3] Exit")
+
+        """Main loop for login and routing"""
+        while True:
+            self.display.clear_screen()
+            print("STUDENT PERFORMANCE ANALYZER")
+            print("[1] Teacher Login\n[2] Student Login\n[3] Exit")
+ main
             
             choice = input("\nSelect an option: ")
             if choice == '1':
@@ -61,7 +69,11 @@ class MenuManager:
         self.student_menu(code)
 
     def teacher_menu(self):
+ yannick-menu-system
         """Phase 5 Requirement: Teacher Menu with 9 options"""
+
+        """Teacher Menu"""
+ main
         while True:
             options = [
                 "Add Student Record", 
@@ -98,7 +110,11 @@ class MenuManager:
             input("\nPress Enter to return to menu...")
 
     def student_menu(self, student_code):
+ yannick-menu-system
         """Phase 5 Requirement: Student Portal with 4 options"""
+
+        """Student Portal"""
+ main
         while True:
             options = [
                 "View My Grades", 
