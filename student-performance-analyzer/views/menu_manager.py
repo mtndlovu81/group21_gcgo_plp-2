@@ -8,6 +8,7 @@ from utils.validators import (
     validate_menu_choice, validate_email,
     validate_student_code, validate_non_empty, validate_score,
 )
+from services.data_importer import DataImporter
 
 
 class MenuManager:
@@ -97,11 +98,12 @@ class MenuManager:
 
         handlers = {
             '1': self._add_student,
+            '2': self._bulk_import,
             '3': self._view_all_students,
             '6': self._update_student,
             '7': self._delete_student,
         }
-        pending = {'2', '4', '5', '8'}
+        pending = {'4', '5', '8'}
 
         while True:
             self.display.clear_screen()
@@ -145,6 +147,20 @@ class MenuManager:
 
             self.display.print_warning(f"Feature [{choice}] coming in the next phase.")
             input("Press Enter to continue...")
+
+    # ------------------------------------------------------------------
+    # F2 — Bulk import
+    # ------------------------------------------------------------------
+
+    def _bulk_import(self):
+        self.display.clear_screen()
+        self.display.print_header("BULK IMPORT (.xlsx)")
+        self.display.print_info("A sample template is at: templates/sample_import.xlsx\n")
+
+        file_path = input("Enter path to .xlsx file: ").strip()
+        importer = DataImporter(self.db)
+        importer.import_from_xlsx(file_path)
+        input("\nPress Enter to continue...")
 
     # ------------------------------------------------------------------
     # F1 — Add student
