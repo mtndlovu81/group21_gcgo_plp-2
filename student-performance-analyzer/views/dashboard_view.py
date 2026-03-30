@@ -30,7 +30,7 @@ class DashboardView:
             return
 
         self._print_class_overview(stats)
-        self._print_subject_breakdown()
+        self._print_student_matrix()
         self._print_score_distribution()
         self._print_struggling_alert()
 
@@ -86,26 +86,65 @@ class DashboardView:
         print(f"  Pass rate      : {stats['pass_rate']}%")
         print(f"{'='*50}\n")
 
-    def _print_subject_breakdown(self):
-        subjects = self.analyzer.get_subject_averages()
-        if not subjects:
+    def _print_student_matrix(self):
+        """Print one student × topic table per subject."""
+        matrix = self.analyzer.get_dashboard_matrix()
+        if not matrix:
             return
 
-        print("  SUBJECT BREAKDOWN\n")
-        rows = []
-        for s in subjects:
-            avg   = float(s['avg_score'])
-            level = Score.get_performance_level(avg)
-            rows.append([
-                s['subject_name'],
-                self.display.color_by_level(f"{s['avg_score']}%", level),
-                f"{s['min_score']}%",
-                f"{s['max_score']}%",
-                s['student_count'],
-            ])
+        missing_cell  = f"{Style.DIM}--- (MISSING){Style.RESET_ALL}"
+        level_colors  = {
+            'Excellent':         Fore.GREEN,
+            'Good':              Fore.CYAN,
+            'Average':           Fore.YELLOW,
+            'Needs Improvement': Fore.RED,
+        }
 
-        print(tabulate(rows, headers=["Subject", "Average", "Min", "Max", "Students"], tablefmt='grid'))
-        print()
+        print("  STUDENT × TOPIC MATRIX\n")
+
+        for subj in matrix:
+            topics   = subj['topics']
+            students = subj['students']
+            scores   = subj['scores']    # {(student_id, topic_id): avg_pct}
+            averages = subj['averages']  # {student_id: avg_pct}
+
+            if not students:
+                continue
+
+            print(f"  {Fore.WHITE}{Style.BRIGHT}{subj['subject_name'].upper()}{Style.RESET_ALL}")
+
+            # Build table header: Student | topic1 | topic2 | ... | Avg
+            headers = ["Student"] + [t['topic_name'] for t in topics] + ["Avg"]
+
+            rows = []
+            for st in students:
+                sid  = st['student_id']
+                name = f"{st['student_code']}  {st['first_name']} {st['last_name']}"
+
+                cells = []
+                for t in topics:
+                    tid = t['topic_id']
+                    pct = scores.get((sid, tid))
+                    if pct is None:
+                        cells.append(missing_cell)
+                    else:
+                        level = Score.get_performance_level(pct)
+                        color = level_colors.get(level, '')
+                        lbl   = 'NEEDS HELP' if level == 'Needs Improvement' else level
+                        cells.append(f"{color}{pct:>5.1f}%  [{lbl}]{Style.RESET_ALL}")
+
+                avg = averages.get(sid)
+                if avg is not None:
+                    level    = Score.get_performance_level(avg)
+                    color    = level_colors.get(level, '')
+                    avg_cell = f"{color}{avg:>5.1f}%{Style.RESET_ALL}"
+                else:
+                    avg_cell = missing_cell
+
+                rows.append([name] + cells + [avg_cell])
+
+            print(tabulate(rows, headers=headers, tablefmt='grid'))
+            print()
 
     def _print_score_distribution(self):
         dist = self.analyzer.get_score_distribution()

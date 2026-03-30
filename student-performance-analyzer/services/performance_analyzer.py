@@ -248,3 +248,83 @@ class PerformanceAnalyzer:
             """,
             (student_id,), fetch='one'
         )
+
+    # ------------------------------------------------------------------
+    # Dashboard matrix
+    # ------------------------------------------------------------------
+
+    def get_dashboard_matrix(self):
+        """Return student × topic score matrix for every subject.
+
+        Returns a list of subject dicts, each containing:
+            subject_name : str
+            topics       : [{'topic_id': int, 'topic_name': str}, ...]
+            students     : [{'student_id', 'student_code', 'first_name', 'last_name'}, ...]
+            scores       : {(student_id, topic_id): avg_pct}   — missing pairs absent
+            averages     : {student_id: avg_pct}                — avg across all scores in subject
+        """
+        subjects = self.db.execute_query(
+            "SELECT subject_id, subject_name FROM subjects ORDER BY subject_name",
+            fetch='all'
+        ) or []
+
+        matrix = []
+        for subj in subjects:
+            sid = subj['subject_id']
+
+            topics = self.db.execute_query(
+                "SELECT topic_id, topic_name FROM topics "
+                "WHERE subject_id = %s ORDER BY topic_name",
+                (sid,), fetch='all'
+            ) or []
+
+            students = self.db.execute_query(
+                """
+                SELECT DISTINCT st.student_id, st.student_code,
+                                st.first_name, st.last_name
+                FROM students st
+                JOIN scores sc     ON st.student_id    = sc.student_id
+                JOIN assessments a ON sc.assessment_id = a.assessment_id
+                WHERE a.subject_id = %s
+                ORDER BY st.student_code
+                """,
+                (sid,), fetch='all'
+            ) or []
+
+            # Per-student per-topic averages
+            topic_rows = self.db.execute_query(
+                """
+                SELECT sc.student_id, sc.topic_id,
+                       ROUND(AVG((sc.score_value / a.max_score) * 100), 1) AS avg_pct
+                FROM scores sc
+                JOIN assessments a ON sc.assessment_id = a.assessment_id
+                WHERE a.subject_id = %s AND sc.topic_id IS NOT NULL
+                GROUP BY sc.student_id, sc.topic_id
+                """,
+                (sid,), fetch='all'
+            ) or []
+            scores = {(r['student_id'], r['topic_id']): float(r['avg_pct']) for r in topic_rows}
+
+            # Per-student subject average (all scores, with or without topic)
+            avg_rows = self.db.execute_query(
+                """
+                SELECT sc.student_id,
+                       ROUND(AVG((sc.score_value / a.max_score) * 100), 1) AS avg_pct
+                FROM scores sc
+                JOIN assessments a ON sc.assessment_id = a.assessment_id
+                WHERE a.subject_id = %s
+                GROUP BY sc.student_id
+                """,
+                (sid,), fetch='all'
+            ) or []
+            averages = {r['student_id']: float(r['avg_pct']) for r in avg_rows}
+
+            matrix.append({
+                'subject_name': subj['subject_name'],
+                'topics':       topics,
+                'students':     students,
+                'scores':       scores,
+                'averages':     averages,
+            })
+
+        return matrix
