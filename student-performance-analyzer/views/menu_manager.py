@@ -10,6 +10,7 @@ from utils.validators import (
 )
 from services.data_importer import DataImporter
 from services.performance_analyzer import PerformanceAnalyzer
+from services.report_generator import ReportGenerator
 from views.dashboard_view import DashboardView
 from views.student_portal import StudentPortal
 
@@ -102,6 +103,8 @@ class MenuManager:
         analyzer  = PerformanceAnalyzer(self.db)
         dashboard = DashboardView(analyzer, self.display)
 
+        report_gen = ReportGenerator(analyzer)
+
         handlers = {
             '1': self._add_student,
             '2': self._bulk_import,
@@ -110,8 +113,9 @@ class MenuManager:
             '5': dashboard.show_struggling_students,
             '6': self._update_student,
             '7': self._delete_student,
+            '8': lambda: self._generate_report(report_gen),
         }
-        pending = {'8'}
+        pending = set()
 
         while True:
             self.display.clear_screen()
@@ -163,6 +167,19 @@ class MenuManager:
                 break
 
             handlers[choice]()
+
+    # ------------------------------------------------------------------
+    # F8 — Generate report
+    # ------------------------------------------------------------------
+
+    def _generate_report(self, report_gen):
+        self.display.clear_screen()
+        self.display.print_header("GENERATE REPORT")
+        save = input("Save report to .txt file? (y/n): ").strip().lower() == 'y'
+        filename = report_gen.generate(save_to_file=save)
+        if filename:
+            self.display.print_success(f"\nReport saved to: {filename}")
+        input("\nPress Enter to continue...")
 
     # ------------------------------------------------------------------
     # F2 — Bulk import
